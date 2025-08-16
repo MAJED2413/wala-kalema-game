@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لعبة ولا كلمة - فريقين</title>
+  <style>
+    body {
+      font-family: 'Tahoma', sans-serif;
+      text-align: center;
+      background: #fdf6e3;
+      color: #333;
+      direction: rtl;
+      padding: 40px;
+    }
+    h1 {
+      color: #d35400;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #27ae60;
+      color: #fff;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #219150;
+    }
+    #word {
+      margin-top: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #2c3e50;
+      display: none;
+    }
+    #score {
+      margin-top: 30px;
+      font-size: 22px;
+      color: #8e44ad;
+    }
+    #turn {
+      margin-top: 20px;
+      font-size: 24px;
+      color: #c0392b;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎭 لعبة ولا كلمة - فريقين 🎭</h1>
+  <p>كل فريق يحاول يشرح الكلمة بدون كلام، وإذا ما عرفها ينتقل الدور للفريق الثاني.</p>
+
+  <button onclick="newWord()">🔄 كلمة جديدة</button>
+  <button onclick="showWord()">👀 أظهر</button>
+  <button onclick="correctGuess()">✅ صح</button>
+  <button onclick="wrongGuess()">❌ خطأ</button>
+
+  <div id="word"></div>
+  <div id="turn">الدور: الفريق A</div>
+  <div id="score">النقاط - A: 0 | B: 0</div>
+
+  <script>
+    const words = {
+      "مهن": ["طبيب", "مهندس", "معلم", "شرطي", "طيار", "نجار", "محامي", "صحفي", "مزارع", "ممرض"],
+      "حيوانات": ["أسد", "قطة", "كلب", "حصان", "فيل", "زرافة", "جمل", "ذئب", "نمر", "غزال"],
+      "مسلسلات عربية": ["باب الحارة", "طاش ما طاش", "شباب البومب", "العاصوف", "الهيبة", "غرابيب سود", "البرنس", "المداح"],
+      "أغاني خليجية": ["الأماكن", "يا بعد حيي", "رهيب", "ذكريات", "بنت أكابر", "تعال"],
+      "مدن خليجية": ["الرياض", "جدة", "دبي", "أبوظبي", "الدوحة", "الكويت", "مسقط", "المنامة", "الخبر", "العين"]
+    };
+
+    let currentWord = "";
+    let currentCategory = "";
+    let scoreA = 0;
+    let scoreB = 0;
+    let currentTeam = "A"; // يبدأ بفريق A
+    let chanceForOther = false; // هل عند الفريق الآخر فرصة للجواب
+
+    function newWord() {
+      const categories = Object.keys(words);
+      currentCategory = categories[Math.floor(Math.random() * categories.length)];
+      const list = words[currentCategory];
+      currentWord = list[Math.floor(Math.random() * list.length)];
+      document.getElementById("word").style.display = "none";
+      document.getElementById("word").textContent = currentWord + " (" + currentCategory + ")";
+      chanceForOther = false; // بداية جديدة، الفريق الأساسي يبدأ
+      updateTurnText();
+    }
+
+    function showWord() {
+      document.getElementById("word").style.display = "block";
+    }
+
+    function correctGuess() {
+      if (currentWord !== "") {
+        if (currentTeam === "A") {
+          scoreA++;
+        } else {
+          scoreB++;
+        }
+        updateScore();
+        switchTurn(true);
+        newWord();
+      }
+    }
+
+    function wrongGuess() {
+      if (!chanceForOther) {
+        // نعطي الفريق الثاني فرصة للجواب
+        chanceForOther = true;
+        switchTurn(false);
+      } else {
+        // إذا أخفق الفريق الثاني أيضاً، نبدل الدور بدون نقاط
+        chanceForOther = false;
+        switchTurn(true);
+        newWord();
+      }
+    }
+
+    function switchTurn(nextRound) {
+      if (currentTeam === "A") {
+        currentTeam = "B";
+      } else {
+        currentTeam = "A";
+      }
+      updateTurnText();
+      if (nextRound) {
+        document.getElementById("word").style.display = "none";
+      }
+    }
+
+    function updateTurnText() {
+      document.getElementById("turn").textContent = "الدور: الفريق " + currentTeam;
+    }
+
+    function updateScore() {
+      document.getElementById("score").textContent = "النقاط - A: " + scoreA + " | B: " + scoreB;
+    }
+  </script>
+</body>
+</html>
